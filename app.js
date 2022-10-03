@@ -1,19 +1,13 @@
 const https = require("https");
-const http = require("http");
-
-function printMessage(username, badgeCount, points) {
-  const message = `${username} has ${badgeCount} total badge(s) and ${points} points in JavaScript`;
-  console.log(message);
-}
 
 function printError(error) {
   console.error(error.message);
 }
 
-function getProfile(username) {
+function getDefinition(word) {
   try {
     const request = https.get(
-      `https://teamtreehouse.com/profiles/${username}.json`,
+      `https://www.dictionaryapi.com/api/v3/references/collegiate/json/${word}?key=a5984853-9a4b-40d7-8820-99c4af5d254c`,
       (response) => {
         if (response.statusCode === 200) {
           let body = "";
@@ -22,18 +16,15 @@ function getProfile(username) {
           });
           response.on("end", () => {
             try {
-              let profile = JSON.parse(body);
-              printMessage(
-                username,
-                profile.badges.length,
-                profile.points.Javascript
-              );
+              let wordParse = JSON.parse(body);
+              const wordDef = wordParse[0].shortdef;
+              console.log(wordDef)
             } catch (error) {
               printError(error);
             }
           });
         } else {
-          const message = `There was an error getting the profile for ${username} (${
+          const message = `There was an error getting the word for ${word} (${
             http.STATUS_CODES[response.statusCode]
           })`;
           const statusCodeError = new Error(message);
@@ -47,5 +38,6 @@ function getProfile(username) {
   }
 }
 
-const users = process.argv.slice(2);
-users.forEach(getProfile);
+const words = process.argv.slice(2);
+console.log(words);
+words.forEach(getDefinition);
